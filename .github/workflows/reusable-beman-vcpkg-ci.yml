@@ -72,6 +72,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Install port via overlay
+        working-directory: ${{ runner.temp }}
         run: |
           PORT_NAME="${{ inputs.port_name }}"
           OVERLAY_DIR="${RUNNER_TEMP}/overlay-ports/${PORT_NAME}"
