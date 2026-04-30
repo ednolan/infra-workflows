@@ -17,9 +17,8 @@ jobs:
       - name: Checkout source repository
         uses: actions/checkout@v6
 
-      - name: Install vcpkg
+      - name: Set up vcpkg
         run: |
-          git clone https://github.com/microsoft/vcpkg.git /usr/local/share/vcpkg
           /usr/local/share/vcpkg/bootstrap-vcpkg.sh
           echo "VCPKG_ROOT=/usr/local/share/vcpkg" >> "$GITHUB_ENV"
 
@@ -89,9 +88,8 @@ jobs:
             exit 1
           fi
 
-      - name: Install vcpkg
+      - name: Set up vcpkg
         run: |
-          git clone https://github.com/microsoft/vcpkg.git /usr/local/share/vcpkg
           /usr/local/share/vcpkg/bootstrap-vcpkg.sh
           echo "VCPKG_ROOT=/usr/local/share/vcpkg" >> "$GITHUB_ENV"
 
