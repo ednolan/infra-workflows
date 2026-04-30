@@ -13,9 +13,18 @@ jobs:
   vcpkg-port-install:
     name: Test port templates
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/bemanproject/infra-containers-gcc:latest
+    env:
+      VCPKG_ROOT: /usr/local/share/vcpkg
     steps:
       - name: Checkout source repository
         uses: actions/checkout@v6
+
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "$VCPKG_ROOT"
+          "$VCPKG_ROOT/bootstrap-vcpkg.sh"
 
       - name: Validate port templates exist
         run: |
@@ -66,12 +75,16 @@ jobs:
         run: |
           PORT_NAME="${{ inputs.port_name }}"
           OVERLAY_DIR="${RUNNER_TEMP}/overlay-ports/${PORT_NAME}"
-          $VCPKG_ROOT/vcpkg install "${PORT_NAME}" \
+          "$VCPKG_ROOT/vcpkg" install "${PORT_NAME}" \
             --overlay-ports="${OVERLAY_DIR}"
 
   vcpkg-developer-build:
     name: Test developer build with vcpkg
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/bemanproject/infra-containers-gcc:latest
+    env:
+      VCPKG_ROOT: /usr/local/share/vcpkg
     steps:
       - name: Checkout source repository
         uses: actions/checkout@v6
@@ -83,10 +96,15 @@ jobs:
             exit 1
           fi
 
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "$VCPKG_ROOT"
+          "$VCPKG_ROOT/bootstrap-vcpkg.sh"
+
       - name: Configure with vcpkg
         run: |
           cmake -B build -G Ninja \
-            -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake \
+            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
             -DCMAKE_CXX_STANDARD=23 \
             -DCMAKE_BUILD_TYPE=Debug
 
