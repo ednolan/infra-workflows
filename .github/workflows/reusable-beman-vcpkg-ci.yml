@@ -71,16 +71,28 @@ jobs:
           cat "${OVERLAY_DIR}/portfile.cmake"
           echo "::endgroup::"
 
-      - name: Install port via overlay
+      - name: Install port via manifest with overlay
         working-directory: ${{ runner.temp }}
         run: |
           PORT_NAME="${{ inputs.port_name }}"
           OVERLAY_DIR="${RUNNER_TEMP}/overlay-ports/${PORT_NAME}"
+
+          # Create a temporary manifest that depends on the port under test
+          mkdir -p port-test && cd port-test
+          cat > vcpkg.json <<MANIFEST_EOF
+          {
+            "name": "port-test",
+            "version": "0.0.0",
+            "dependencies": ["${PORT_NAME}"]
+          }
+          MANIFEST_EOF
+
           # Copy vcpkg-configuration.json so vcpkg can resolve registry dependencies
           if [ -f "${GITHUB_WORKSPACE}/vcpkg-configuration.json" ]; then
             cp "${GITHUB_WORKSPACE}/vcpkg-configuration.json" .
           fi
-          "$VCPKG_ROOT/vcpkg" install "${PORT_NAME}" \
+
+          "$VCPKG_ROOT/vcpkg" install \
             --overlay-ports="${OVERLAY_DIR}"
 
   vcpkg-developer-build:
