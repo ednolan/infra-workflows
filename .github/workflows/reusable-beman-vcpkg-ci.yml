@@ -76,6 +76,10 @@ jobs:
         run: |
           PORT_NAME="${{ inputs.port_name }}"
           OVERLAY_DIR="${RUNNER_TEMP}/overlay-ports/${PORT_NAME}"
+          # Copy vcpkg-configuration.json so vcpkg can resolve registry dependencies
+          if [ -f "${GITHUB_WORKSPACE}/vcpkg-configuration.json" ]; then
+            cp "${GITHUB_WORKSPACE}/vcpkg-configuration.json" .
+          fi
           "$VCPKG_ROOT/vcpkg" install "${PORT_NAME}" \
             --overlay-ports="${OVERLAY_DIR}"
 
